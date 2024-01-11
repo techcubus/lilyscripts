@@ -6,12 +6,12 @@
 
 # Constants 
 # Name of this file in to PROGNAME
-PROGNAME=$(/bin/basename $0)
+PROGNAME=$(basename ${0})
 
 # Path to this file in to PROGPATH
-PROGPATH=$(echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,')
+PROGPATH=$(realpath ${0})
 
-REVISION="1"
+REVISION="1-pre"
 
 # help() - uses PROGNAME, spits out brief help for command.
 print_help() {
