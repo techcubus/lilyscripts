@@ -4,15 +4,21 @@ use strict;
 use warnings;
 use JSON;
 
+my $backup_file;
+my $fh;
+my $header;
+my $num_channels;
+my @channels;
+my $data;
+
 # my $backup_file = 'path/to/backup/file.bfb';
 # ChatGPT showed us a static example. Will add multiple file handling.
 # For now, just one file.
-my $backup_file = $ARGV[0];
-open my $fh, '<:raw', $backup_file or die "Can't open $backup_file: $!";
+$backup_file = $ARGV[0];
+open $fh, '<:raw', $backup_file or die "Can't open $backup_file: $!";
 
 # This goes off the rails quickly
 # Read the header
-my $header;
 read($fh, $header, 8);
 
 # Check the file type
@@ -23,24 +29,40 @@ read($fh, $header, 8);
 
 # Number of channels is fixed. We need verification that the file
 # is the expected format in here in the future
-my $num_channels = 128;
+$num_channels = 8;
 
 # This is a bizarre mess not totally unexpected from GenAI...
-my @channels;
-for (my $i = 0; $i < $num_channels; $i++) {
+
+for ( my $i = 0; $i < $num_channels; $i++ ) {
     # Read the channel data
     # Data size needed fixing
-    my $data;
-    read($fh, $data, 32);
+    read($fh, $data, 16);
 
     # Unpack the data into a hash
     # This is a mess, totally out of order but some of the correct fields
     # In reality, all we find at this point is frequency data in LE BCD
-    my %channel = (
-       'index' => $i,
-       'freq' => unpack("(CCCC)>", substr($data, 0, 4)) / 1000000,
-       'offset_freq' => unpack("V", substr($data, 4, 4)) / 1000000,
-    );
+    my %channel;
+    $channel{'index'} = $i;
+    my @bcd_freq = unpack("L", substr($data, 0, 4)) / 1000000;
+    printf( "Hex: %4X\n", unpack("L", substr($data, 0, 4)));
+    print "Index: $channel{'index'}\n";
+    print "Eval frequency @bcd_freq\n";
+
+    my $acc = 0;
+    for ( my $batch = 0; $batch < 16; $batch++ ) {
+        for ( my $j = 0; $j < 4; $j++ ) {
+            my $bindex =0;
+            my $byt;
+            if ( exists( $bcd_freq[ $bindex ] ) )
+            {
+                $byt = $bcd_freq[ $bindex++ ];
+                $acc *= 256;
+                $acc += $byt;
+            }
+        }
+    }
+    $channel{'freq'} = $acc;
+#    $channel{'offset_freq'} = unpack("V", substr($data, 4, 4)) / 10000000;
 
 #    my %channel = (
 #        name => unpack("Z16", substr($data, 0, 16)),
@@ -64,8 +86,9 @@ for (my $i = 0; $i < $num_channels; $i++) {
 
 close $fh;
 
-my $json;
-$json = $json->pretty(1);
-$json = encode_json(\@channels);
+my $json = JSON->new->allow_nonref;
+my $enable = "true";
+$json = $json->pretty([$enable]);
+$json = $json->encode([@channels]);
 
 print $json;
