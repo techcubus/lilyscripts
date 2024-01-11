@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# Alias to yt-dlp to download video
+# Written by Lily
+# Last Modified: 1/10/2024
+
+# Constants 
+# Name of this file in to PROGNAME
+PROGNAME=$(/bin/basename $0)
+
+# Path to this file in to PROGPATH
+PROGPATH=$(echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,')
+
+REVISION="1"
+
+# help() - uses PROGNAME, spits out brief help for command.
+print_help() {
+	echo "Usage: $PROGNAME"
+	echo "       $PROGNAME <yt video url>"
+	echo "       $PROGNAME <yt playlist url>"
+}
+
+while test -n "$1"; do
+	case "$1" in
+        	--help|-h)
+			print_help
+			exit
+			;;
+		--version|-V)
+			print_revision $PROGNAME $REVISION
+			exit
+			;;
+		*)
+			yt-dlp --embed-subs -o "%(uploader)s/%(title)s.%(ext)s" "${1}"
+			;;
+	esac
+	shift
+done
+
