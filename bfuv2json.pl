@@ -29,7 +29,7 @@ read($fh, $header, 8);
 
 # Number of channels is fixed. We need verification that the file
 # is the expected format in here in the future
-$num_channels = 8;
+$num_channels = 5;
 
 # This is a bizarre mess not totally unexpected from GenAI...
 
@@ -43,27 +43,9 @@ for ( my $i = 0; $i < $num_channels; $i++ ) {
     # In reality, all we find at this point is frequency data in LE BCD
     my %channel;
     $channel{'index'} = $i;
-    my @bcd_freq = unpack("L", substr($data, 0, 4)) / 1000000;
-    printf( "Hex: %4X\n", unpack("L", substr($data, 0, 4)));
-    print "Index: $channel{'index'}\n";
-    print "Eval frequency @bcd_freq\n";
+    $channel{'freq'} = sprintf( "%4X", unpack("L", substr($data, 0, 4)));
 
-    my $acc = 0;
-    for ( my $batch = 0; $batch < 16; $batch++ ) {
-        for ( my $j = 0; $j < 4; $j++ ) {
-            my $bindex =0;
-            my $byt;
-            if ( exists( $bcd_freq[ $bindex ] ) )
-            {
-                $byt = $bcd_freq[ $bindex++ ];
-                $acc *= 256;
-                $acc += $byt;
-            }
-        }
-    }
-    $channel{'freq'} = $acc;
 #    $channel{'offset_freq'} = unpack("V", substr($data, 4, 4)) / 10000000;
-
 #    my %channel = (
 #        name => unpack("Z16", substr($data, 0, 16)),
 #        freq => unpack("V", substr($data, 16, 4)) / 1000000,
