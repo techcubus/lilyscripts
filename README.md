@@ -1,6 +1,21 @@
 # lilyscripts
 Personal scrips for making my life easier &lt;3
 
+### C++ "scripts"
+- isochart.cpp
+
+   C++ program to print out an HTML chart of ISO ampersand codes
+
+- npinfo.cpp
+
+   C++ program that examines Neo Geo Pocket/Pocket Color ROMs headers
+
+### Perl scripts
+- uv5r2json.pl
+
+   Disassembles Baofeng UV5R radio basckups into JSON for blind people and blind computers
+  
+
 ### QEMU startup scripts, meant to run with screen 
 - aux311.sh
   
@@ -40,3 +55,13 @@ Personal scrips for making my life easier &lt;3
 - mirror-yt
 
    Alias for yt-dlp to grab YouTube videos with preferred defaults
+
+- current_temp.sh
+
+   Alias to get the current temp from NOAA
+
+- grabweather.sh
+
+   Alias to grab weather forecast from NOAA
+
+  
