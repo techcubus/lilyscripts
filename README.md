@@ -58,7 +58,7 @@ Personal scrips for making my life easier &lt;3
 
 - current_temp.sh
 
-   Alias to get the current temp from NOAA
+   Alias to get the current temp from wunderground - broken, i think
 
 - grabweather.sh
 
