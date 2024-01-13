@@ -1,0 +1,4 @@
+#!/bin/bash
+USER_AGENT="Mozilla/5.0"
+
+wget -r -nH -np --wait=1.1 --random-wait -e robots=off --user-agent=${USER_AGENT} ${1}
