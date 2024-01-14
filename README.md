@@ -1,5 +1,5 @@
 # lilyscripts
-Personal scrips for making my life easier &lt;3
+Personal scrips for making my life easier and solving problems with code &lt;3
 
 ### C++ "scripts"
 - isochart.cpp
@@ -8,12 +8,12 @@ Personal scrips for making my life easier &lt;3
 
 - npinfo.cpp
 
-   C++ program that examines Neo Geo Pocket/Pocket Color ROMs headers
+   C++ program that examines Neo Geo Pocket/Pocket Color game ROM headers
 
 ### Perl scripts
 - uv5r2json.pl
 
-   Disassembles Baofeng UV5R radio basckups into JSON for blind people and blind computers
+   Disassembles Baofeng UV5R radio backups into JSON for blind people and blind computers
   
 
 ### QEMU startup scripts, meant to run with screen 
@@ -58,10 +58,10 @@ Personal scrips for making my life easier &lt;3
 
 - current_temp.sh
 
-   Alias to get the current temp from wunderground - broken, i think
+   Script to get the current outdoor temperature from NOAA. Would like to add options
 
 - grabweather.sh
 
-   Alias to grab weather forecast from NOAA
+   Alias to grab weather forecast from NOAA, broken after API change
 
   
