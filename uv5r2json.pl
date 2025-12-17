@@ -85,7 +85,7 @@ for ( my $i = 0; $i < $num_channels; $i++ ) {
 #        comment => unpack("Z20", substr($data, 40, 20)),
 #    );
 
-# Close our file handle lighe a good girl
+# Close our file handle like a good girl
 close $fh;
 
 # Create the JSON object with libjson-perl
