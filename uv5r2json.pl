@@ -20,9 +20,28 @@ my $fh;
 my $header;
 my $num_channels = 128;
 my @channels;
+
+# Data processing temp variables
 my $data;
-my $makeup = "";
-my $debug  = "";
+my $qdata;
+my $qdatalo;
+my $qdatahi;
+my $flags;
+my $tone_x10;
+
+# Options
+my $makeup = "true";
+my $debug  = "true";
+
+# Actual handling of BCD to MHz values
+sub bcd10hz_to_mhz {
+    my ($bytes4) = @_;
+    my $be = reverse($bytes4);           # little endian  -> big endian
+    my $hex = unpack("H8", $be);         # 8 nibbles, each should be 0-9
+    return undef if $hex =~ /[a-f]/i;    # not valid BCD
+    my $n = 0 + $hex;                    # decimal digits -> integer
+    return $n / 100000.0;                # 10Hz units => MHz
+}
 
 # For now, just one file.
 $backup_file = $ARGV[0];
@@ -39,7 +58,7 @@ read($fh, $header, 8);
 # Number of channels is fixed. We need verification that the file
 # is the expected format in here in the future. We also need
 # argument parsing
-$num_channels = 64;
+$num_channels = 128;
 
 # This has been pretty much rewritten in structure from the GenAI by now
 
@@ -52,15 +71,38 @@ for ( my $i = 0; $i < $num_channels; $i++ ) {
     # Add channel index and unpack the frequency data into a hash
     my %channel;
     $channel{'index'} = $i;
-    if ( $debug ) {print(sprintf ( "FChunk($i): %4X\n", unpack( "L", $data )))};
-    if ( $debug ) {print( Dumper( $data ) )};
-    $channel{'freq'} = sprintf( "%4X", unpack("L", substr($data, 0, 4)));
+    if ( $debug ) {
+        print(sprintf ( "FChunk(%03d): %08X %08X\n",
+        $i,
+        unpack( "V", substr($data,0,4) ),
+        unpack( "V", substr($data,4,8))))
+        };
+    $channel{'freq_raw'} = unpack("H16", $data);      # you read 8 bytes
+    $channel{'freq'} = sprintf( "%4X", unpack("V", substr($data, 0, 4)));
+    $channel{'rx_mhz'} = bcd10hz_to_mhz(substr($data,0,4));
+    $channel{'tx_mhz'} = bcd10hz_to_mhz(substr($data,4,4));
+
 
     # Get channel attributes. These will be discovered eventually
     read( $fh, $data, 8 );
-    if ( $debug ) {print(sprintf ( "AChunk($i): %4X\n", unpack( "L", $data )))};
-    if ( $debug ) {print( Dumper( $data ) )};
-    $channel{'attribs'} = sprintf( "%4X", unpack("L", substr($data, 0, 4)));
+    if ($debug) {
+       my $raw = unpack("H16", $data);
+       my $hi  = unpack("V", substr($data,0,4));
+       my $lo  = unpack("V", substr($data,4,4));
+       my $q   = unpack("Q<", $data);               # explicit LE
+       $flags = unpack("C", substr($data,7,1));
+
+       printf "AChunk(%03d): raw=%s lo=%08X hi=%08X q=%016X\n",
+        $i, $raw, $lo, $hi, $q;
+       printf "CH%03d flags=%02X bits=%08b widebit=%d\n\n",
+        $i, $flags, $flags, ($flags & 0x40) ? 1 : 0;
+}
+    $channel{'attribs_raw'} = unpack("H16", $data);   # 8 bytes => 16 hex chars
+    $channel{'attribs'} = sprintf( "%4X", unpack("V", substr($data, 0, 4)));
+    $tone_x10 = unpack("v", substr($data, 2, 2));
+    $channel{'tone_hz'} = $tone_x10 ? ($tone_x10 / 10.0) : undef;
+    
+
 
     # Stick the channel in an array and loop
     push @channels, \%channel;
