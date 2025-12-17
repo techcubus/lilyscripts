@@ -5,10 +5,10 @@ export QEMU_AUDIO_DRV=pa
 
 cd ${QEMU_ROOT}
 
-if $(false); then
+if $(true); then
 	$NET_OPTS="-netdev user,id=network0 -device sungem,netdev=network0"
 fi
-if $(true) ; then
+if $(false) ; then
 	$NET_OPTS="-netdev tap,id=tap0,ifname=tap0,script=no,downscript=no -device tap0,sungem,netdev=tap0"
 fi
 
@@ -29,6 +29,6 @@ ${QEMU_ROOT}/qemu-system-ppc \
 	-rtc base=localtime \
 	-drive file=${DRIVEIMG_ROOT}/MacOS9.2.img,format=qcow2,media=disk \
 	-drive file="${DRIVEIMG_ROOT}/HD1 BlueSCSI v2 PicoW Setup.hda",format=raw,media=cdrom \
-	-drive file=${DRIVEIMG_ROOT}/hexorcist.iso,format=raw,media=cdrom \
+	-drive file=${DRIVEIMG_ROOT}/SoftwareLibrary.img,format=raw,media=disk \
 	-drive file=${DRIVEIMG_ROOT}/destination_internet.iso,format=raw,media=cdrom \
 	${NET_OPTS}
