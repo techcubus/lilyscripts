@@ -64,4 +64,7 @@ Personal scrips for making my life easier and solving problems with code &lt;3
 
    Alias to grab weather forecast from NOAA, broken after API change
 
-  
+- gittr.sh
+
+  Script that works in conjunction with gh to grab all my github repos in one go
+    
